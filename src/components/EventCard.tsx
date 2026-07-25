@@ -22,6 +22,10 @@ const byPrefixAndName: { fas: Record<string, IconDefinition> } = {
     "pen-to-square": {
       viewBox: [0, 0, 512, 512],
       path: "M362.7 19.3C387.7-5.7 428.3-5.7 453.3 19.3L492.7 58.7C517.7 83.7 517.7 124.3 492.7 149.3L244.1 397.9c-9 9-20.3 15.4-32.8 18.5L128 437.3c-8.4 2.1-17.2-.4-23.2-6.4s-8.5-14.8-6.4-23.2l20.8-83.3c3.1-12.5 9.5-23.8 18.5-32.8L362.7 19.3zM80 64C35.8 64 0 99.8 0 144V432c0 44.2 35.8 80 80 80H368c44.2 0 80-35.8 80-80V336c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V144c0-8.8 7.2-16 16-16H176c17.7 0 32-14.3 32-32S193.7 64 176 64H80z"
+    },
+    "badge-check": {
+      viewBox: [0, 0, 512, 512],
+      path: "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47 111-111c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
     }
   }
 };
@@ -159,6 +163,13 @@ function formatDateAndTime(value: string): { date: FormattedDateParts; time: str
   };
 }
 
+function isEventDatePassed(value: string): boolean {
+  if (!value) return false;
+  const eventDate = new Date(value);
+  if (Number.isNaN(eventDate.getTime())) return false;
+  return eventDate.getTime() < Date.now();
+}
+
 export default function EventCard({
   event,
   dateValue,
@@ -169,6 +180,7 @@ export default function EventCard({
   onViewUsers
 }: EventCardProps) {
   const { date, time } = formatDateAndTime(dateValue);
+  const isPastEvent = isEventDatePassed(dateValue);
 
   return (
     <div
@@ -186,18 +198,21 @@ export default function EventCard({
       }}
     >
       <div className="event-card-header">
-        <h3 className="event-title">{event.title}</h3>
+        <h3 className="event-title">
+          {event.title}
+          {isPastEvent && <FontAwesomeIcon icon={byPrefixAndName.fas["badge-check"]} className="event-title-passed-icon" />}
+        </h3>
       </div>
 
       <div className="event-card-body">
         <p className="event-meta-line">
-          <span className="event-meta-value">{event.description || "-"}</span>
+          <span className="event-meta-value event-description">{event.description || "-"}</span>
         </p>
 
         <div className="event-facts">
           <p className="event-meta-line">
             <span className="event-tag">Date</span>
-            <span className="event-meta-value">
+            <span className={isPastEvent ? "event-meta-value event-meta-value-past" : "event-meta-value"}>
               {date.day && date.suffix && date.monthYear ? (
                 <>
                   {date.day}
@@ -210,7 +225,7 @@ export default function EventCard({
           </p>
           <p className="event-meta-line">
             <span className="event-tag">Time</span>
-            <span className="event-meta-value">{time}</span>
+            <span className={isPastEvent ? "event-meta-value event-meta-value-past" : "event-meta-value"}>{time}</span>
           </p>
           <p className="event-meta-line">
             <span className="event-tag">Capacity</span>

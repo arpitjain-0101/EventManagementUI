@@ -511,6 +511,14 @@ button + button {
   color: var(--text);
 }
 
+.event-title-passed-icon {
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 8px;
+  vertical-align: -0.08em;
+  color: #16a34a;
+}
+
 .event-meta-line {
   display: flex;
   align-items: center;
@@ -523,6 +531,12 @@ button + button {
 .event-meta-value {
   color: color-mix(in srgb, var(--text) 88%, var(--muted));
   font-weight: 500;
+}
+
+.event-description {
+  padding: 5px 0;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 .event-date-suffix {
@@ -555,6 +569,15 @@ button + button {
   display: grid;
   gap: 2px;
   margin-bottom: 0;
+}
+
+.event-facts .event-tag,
+.event-facts .event-meta-value {
+  font-family: system-ui;
+}
+
+.event-meta-value-past {
+  text-decoration: line-through;
 }
 
 .event-capacity {
