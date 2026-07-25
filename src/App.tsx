@@ -30,6 +30,35 @@ const availableThemes: Array<{ value: ThemeName; label: string }> = [
   { value: "sunset", label: "Sunset" }
 ];
 
+type IconDefinition = {
+  viewBox: [number, number, number, number];
+  path: string;
+};
+
+const byPrefixAndName: { fas: Record<string, IconDefinition> } = {
+  fas: {
+    xmark: {
+      viewBox: [0, 0, 384, 512],
+      path: "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+    }
+  }
+};
+
+function FontAwesomeIcon({ icon, className }: { icon: IconDefinition; className?: string }) {
+  const [minX, minY, width, height] = icon.viewBox;
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+      viewBox={`${minX} ${minY} ${width} ${height}`}
+      fill="currentColor"
+    >
+      <path d={icon.path} />
+    </svg>
+  );
+}
+
 function toDateTimeLocalValue(value?: string): string {
   if (!value) return "";
   const d = new Date(value);
@@ -437,8 +466,14 @@ export default function App() {
               <h3>
                 Event Details | <span className="modal-event-tag">{detailsEvent.title}</span>
               </h3>
-              <button type="button" className="ghost-btn" onClick={closeEventDetails}>
-                Close
+              <button
+                type="button"
+                className="ghost-btn modal-close-btn"
+                aria-label="Close"
+                title="Close"
+                onClick={closeEventDetails}
+              >
+                <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
               </button>
             </div>
 
