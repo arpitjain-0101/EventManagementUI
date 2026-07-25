@@ -1,22 +1,19 @@
 ﻿import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
-  createEvent,
   deleteEventRegistration,
-  deleteEvent,
   getEventRegistrations,
-  getEvents,
   register,
-  updateEvent,
   type CreateEventRegistrationPayload,
   type EventDto,
   type EventRegistrationDto,
-  type EventPayload,
-  type EventsResponse
+  type EventPayload
 } from "./api";
 import EventCard from "./components/EventCard";
 import EventForm from "./components/EventForm";
 import RegisterUserModal from "./components/RegisterUserModal";
 import RegistrationsModal from "./components/RegistrationsModal";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { createEventThunk, deleteEventThunk, fetchEvents, updateEventThunk } from "./store/eventsSlice";
 import "./App.css";
 
 const blank: EventPayload = { title: "", description: "", date: "", maxCapacity: 10 };
@@ -69,6 +66,9 @@ function formatEventDateTimeForModal(value?: string): { date: string; time: stri
 }
 
 export default function App() {
+  const dispatch = useAppDispatch();
+  const events = useAppSelector((state) => state.events.items);
+  const eventsError = useAppSelector((state) => state.events.error);
   const eventFormContainerRef = useRef<HTMLDivElement | null>(null);
   const eventCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const blinkTimerRef = useRef<number | null>(null);
@@ -87,10 +87,8 @@ export default function App() {
     }
     return "teal-green-light";
   });
-  const [events, setEvents] = useState<EventDto[]>([]);
   const [form, setForm] = useState<EventPayload>(blank);
   const [editId, setEditId] = useState<number | string | null>(null);
-  const [error, setError] = useState("");
   const [activeEvent, setActiveEvent] = useState<EventDto | null>(null);
   const [registrations, setRegistrations] = useState<EventRegistrationDto[]>([]);
   const [registrationsError, setRegistrationsError] = useState("");
@@ -110,21 +108,9 @@ export default function App() {
   const [isDetailsRegistrationsLoading, setIsDetailsRegistrationsLoading] = useState(false);
   const detailsRequestRef = useRef(0);
 
-  async function load() {
-    try {
-      const data: EventsResponse = await getEvents();
-      const list = Array.isArray(data) ? data : Array.isArray(data?.events) ? data.events : [];
-      setEvents(list);
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setEvents([]);
-    }
-  }
-
   useEffect(() => {
-    void load();
-  }, []);
+    void dispatch(fetchEvents());
+  }, [dispatch]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -174,11 +160,12 @@ export default function App() {
     };
 
     try {
-      const savedEvent = isUpdating && editId !== null ? await updateEvent(editId, payload) : await createEvent(payload);
+      const savedEvent =
+        isUpdating && editId !== null
+          ? await dispatch(updateEventThunk({ id: editId, payload })).unwrap()
+          : await dispatch(createEventThunk(payload)).unwrap();
       setForm(blank);
       setEditId(null);
-      await load();
-      setError("");
       showSuccessMessage(isUpdating ? "Event Updated !!" : "Event Created !!");
 
       const savedEventKey = String(savedEvent.id);
@@ -195,7 +182,7 @@ export default function App() {
       }, 1100);
     } catch (e) {
       setSuccessMessage("");
-      setError(e instanceof Error ? e.message : String(e));
+      console.error(e);
     }
   }
 
@@ -228,7 +215,7 @@ export default function App() {
     try {
       await deleteEventRegistration(activeEvent.id, userId);
       setRegistrations((prev) => prev.filter((user) => user.userId !== userId));
-      await load();
+      await dispatch(fetchEvents());
     } catch (e) {
       setRegistrationsError(e instanceof Error ? e.message : String(e));
     }
@@ -268,7 +255,7 @@ export default function App() {
     try {
       await register(registerEvent.id, payload);
       closeRegisterModal();
-      await load();
+      await dispatch(fetchEvents());
     } catch (e) {
       setRegistrationError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -351,13 +338,11 @@ export default function App() {
     if (!eventToDelete) return;
     setIsDeleteSubmitting(true);
     try {
-      await deleteEvent(eventToDelete.id);
-      await load();
+      await dispatch(deleteEventThunk(eventToDelete.id)).unwrap();
       setEventToDelete(null);
-      setError("");
       showSuccessMessage("Event Deleted !!");
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.error(e);
     } finally {
       setIsDeleteSubmitting(false);
     }
@@ -389,7 +374,7 @@ export default function App() {
         </div>
       )}
 
-      {error && <p className="error">{error}</p>}
+      {eventsError && <p className="error">{eventsError}</p>}
 
       <section className="events-panel" aria-label="Events section">
         <h3 className="events-panel-title">Event List</h3>
