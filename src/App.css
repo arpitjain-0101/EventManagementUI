@@ -410,6 +410,9 @@ button + button {
 /* Event cards */
 .event-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: 0;
   margin-bottom: 0;
   border: 1px solid var(--border);
@@ -436,6 +439,7 @@ button + button {
 
 .event-card-body {
   background: transparent;
+  flex: 1;
 }
 
 .event-card-footer {
@@ -550,6 +554,12 @@ button + button {
 }
 
 .event-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: calc(1.55em * 2);
   padding: 5px 0;
   font-size: 13px;
   font-weight: bold;
