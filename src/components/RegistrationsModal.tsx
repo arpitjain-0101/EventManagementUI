@@ -59,9 +59,11 @@ export default function RegistrationsModal({
           <h3>
             Attendees List | <span className="modal-event-tag">{activeEvent.title}</span>
           </h3>
-          <button type="button" className="ghost-btn modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
-            <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
-          </button>
+          <div className="modal-header-actions">
+            <button type="button" className="ghost-btn modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
+              <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
+            </button>
+          </div>
         </div>
 
         {registrationsError && <p className="error">{registrationsError}</p>}

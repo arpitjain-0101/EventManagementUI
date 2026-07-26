@@ -466,15 +466,17 @@ export default function App() {
               <h3>
                 Event Details | <span className="modal-event-tag">{detailsEvent.title}</span>
               </h3>
-              <button
-                type="button"
-                className="ghost-btn modal-close-btn"
-                aria-label="Close"
-                title="Close"
-                onClick={closeEventDetails}
-              >
-                <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
-              </button>
+              <div className="modal-header-actions">
+                <button
+                  type="button"
+                  className="ghost-btn modal-close-btn"
+                  aria-label="Close"
+                  title="Close"
+                  onClick={closeEventDetails}
+                >
+                  <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
+                </button>
+              </div>
             </div>
 
             <p className="event-details-description">{detailsEvent.description || "-"}</p>
