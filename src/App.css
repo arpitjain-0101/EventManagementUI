@@ -519,6 +519,22 @@ button + button {
   color: #16a34a;
 }
 
+.event-title-upcoming-icon {
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 8px;
+  vertical-align: -0.08em;
+  color: #dc2626;
+}
+
+.event-title-future-icon {
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 8px;
+  vertical-align: -0.08em;
+  color: #267bdc;
+}
+
 .event-meta-line {
   display: flex;
   align-items: center;
