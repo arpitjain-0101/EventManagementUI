@@ -48,6 +48,11 @@ Before running locally, ensure you have:
 
 The frontend reads API base URL from Vite environment variables.
 
+Default API URLs by environment:
+
+- Development (npm run dev): http://localhost:5073
+- Production build (npm run build / npm run preview): https://eventmanagementapi-bkcucwf3b4e7djf7.canadacentral-01.azurewebsites.net
+
 1. Create a local environment file:
 
 ```bash
@@ -66,7 +71,12 @@ Copy-Item .env.example .env
 VITE_API_URL=http://localhost:5073
 ```
 
-If VITE_API_URL is not set, the app falls back to http://localhost:5073.
+If VITE_API_URL is set, it overrides the default for both environments.
+
+If VITE_API_URL is not set, the app uses:
+
+- http://localhost:5073 in development
+- https://eventmanagementapi-bkcucwf3b4e7djf7.canadacentral-01.azurewebsites.net in production build
 
 ## Install Dependencies
 
@@ -110,7 +120,7 @@ In package.json:
 
 ## Backend API Contract
 
-The frontend uses these endpoints (base URL = VITE_API_URL):
+The frontend uses these endpoints (base URL = VITE_API_URL when set, otherwise environment defaults above):
 
 ### Events
 - GET /api/events
