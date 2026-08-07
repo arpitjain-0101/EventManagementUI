@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { deleteEventRegistration, getEventRegistrations, type EventDto, type EventRegistrationDto } from "../api";
+import "./ModalCommon.css";
+import "./RegistrationsModal.css";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];
@@ -106,18 +108,18 @@ export default function RegistrationsModal({
             Attendees List | <span className="modal-event-tag">{activeEvent.title}</span>
           </h3>
           <div className="modal-header-actions">
-            <button type="button" className="ghost-btn modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
+            <button type="button" className="ui-btn-ghost modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
               <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
             </button>
           </div>
         </div>
 
-        {registrationsError && <p className="error">{registrationsError}</p>}
+        {registrationsError && <p className="ui-error">{registrationsError}</p>}
         {isRegistrationsLoading && <p>Loading users...</p>}
 
         {!isRegistrationsLoading && (
-          <div className="users-grid" role="table" aria-label="Registered users">
-            <div className="users-grid-row users-grid-head" role="row">
+          <div className="modal-users-grid" role="table" aria-label="Registered users">
+            <div className="modal-users-grid-row modal-users-grid-head" role="row">
               <div role="columnheader">UserId</div>
               <div role="columnheader">Name</div>
               <div role="columnheader">Email</div>
@@ -125,17 +127,17 @@ export default function RegistrationsModal({
             </div>
 
             {registrations.length === 0 ? (
-              <div className="users-grid-empty">No users registered for this event.</div>
+              <div className="modal-users-grid-empty">No users registered for this event.</div>
             ) : (
               registrations.map((user) => (
-                <div className="users-grid-row" role="row" key={user.userId}>
+                <div className="modal-users-grid-row" role="row" key={user.userId}>
                   <div role="cell">{user.userId || "-"}</div>
                   <div role="cell">{user.name || "-"}</div>
                   <div role="cell">{user.email || "-"}</div>
                   <div role="cell">
                     <button
                       type="button"
-                      className="danger-icon-btn"
+                      className="modal-danger-icon-btn"
                       aria-label={`Delete ${user.userId} from event`}
                       title="Delete user from event"
                       disabled={removingUserId === user.userId}
@@ -143,7 +145,7 @@ export default function RegistrationsModal({
                         void removeUserFromEvent(user.userId);
                       }}
                     >
-                      <FontAwesomeIcon icon={byPrefixAndName.fas["trash"]} className="danger-icon-svg" />
+                      <FontAwesomeIcon icon={byPrefixAndName.fas["trash"]} className="modal-danger-icon-svg" />
                     </button>
                   </div>
                 </div>

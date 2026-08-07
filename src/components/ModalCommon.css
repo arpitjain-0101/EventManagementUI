@@ -1,0 +1,101 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.modal-panel {
+  width: min(900px, 100%);
+  max-height: 86vh;
+  overflow: auto;
+  padding: 16px;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
+}
+
+.modal-panel-compact {
+  width: min(650px, 100%);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-event-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  margin-left: 6px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--primary) 36%, var(--border));
+  background: color-mix(in srgb, var(--primary) 12%, var(--shell));
+  color: var(--primary);
+  font-size: 0.78em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.modal-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-btn-mock {
+  padding: 6px 10px;
+  font-size: 0.74rem;
+}
+
+.modal-close-btn {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-icon {
+  width: 0.82em;
+  height: 0.82em;
+}
+
+.modal-delete-message {
+  margin: 4px 0 14px;
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+  font-size: 0.98rem;
+}
+
+.modal-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-delete-actions button {
+  min-width: 88px;
+}
+
+.modal-form {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.modal-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 600;
+}

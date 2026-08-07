@@ -1,4 +1,5 @@
 import type { EventDto } from "../api";
+import "./EventCard.css";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];

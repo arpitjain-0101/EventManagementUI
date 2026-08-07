@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { register, type CreateEventRegistrationPayload, type EventDto } from "../api";
+import "./ModalCommon.css";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];
@@ -119,10 +120,10 @@ export default function RegisterUserModal({
         <div className="modal-header">
           <h3>Register user for {registerEvent.title}</h3>
           <div className="modal-header-actions">
-            <button type="button" className="mock-btn modal-mock-btn" onClick={fillMockRegistration}>
+            <button type="button" className="ui-btn-mock modal-btn-mock" onClick={fillMockRegistration}>
               Mock
             </button>
-            <button type="button" className="ghost-btn modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
+            <button type="button" className="ui-btn-ghost modal-close-btn" aria-label="Close" title="Close" onClick={onClose}>
               <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
             </button>
           </div>
@@ -172,7 +173,7 @@ export default function RegisterUserModal({
             />
           </label>
 
-          {registrationError && <p className="error">{registrationError}</p>}
+          {registrationError && <p className="ui-error">{registrationError}</p>}
 
           <button type="submit" disabled={isSubmittingRegistration}>
             {isSubmittingRegistration ? "Enrolling..." : "Enroll"}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getEventRegistrations, type EventDto, type EventRegistrationDto } from "../api";
+import "./EventDetailsModal.css";
+import "./ModalCommon.css";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];
@@ -112,7 +114,7 @@ export default function EventDetailsModal({ event, onClose }: EventDetailsModalP
           <div className="modal-header-actions">
             <button
               type="button"
-              className="ghost-btn modal-close-btn"
+              className="ui-btn-ghost modal-close-btn"
               aria-label="Close"
               title="Close"
               onClick={onClose}
@@ -154,7 +156,7 @@ export default function EventDetailsModal({ event, onClose }: EventDetailsModalP
         <div className="event-details-attendees">
           <h4 className="event-details-attendees-title">Attendees ({registrations.length})</h4>
 
-          {registrationsError && <p className="error">{registrationsError}</p>}
+          {registrationsError && <p className="ui-error">{registrationsError}</p>}
           {isRegistrationsLoading && <p className="event-details-loading">Loading attendees...</p>}
 
           {!isRegistrationsLoading && !registrationsError &&

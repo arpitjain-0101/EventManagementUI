@@ -1,0 +1,116 @@
+.event-form {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary) 78%, white),
+    color-mix(in srgb, var(--primary-2) 82%, black)
+  );
+  opacity: 0.8;
+}
+
+.event-form-is-highlighted form {
+  transform-origin: center top;
+  animation:
+    event-form-blink 1s ease-in-out 1,
+    event-form-zoom-pulse 0.34s ease-in-out 3;
+}
+
+@keyframes event-form-blink {
+  0%,
+  100% {
+    border-color: var(--border);
+    box-shadow: var(--shadow-soft);
+  }
+  25%,
+  75% {
+    border-color: color-mix(in srgb, var(--primary) 58%, var(--border));
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--primary) 24%, transparent),
+      0 0 22px color-mix(in srgb, var(--primary) 26%, transparent);
+  }
+}
+
+@keyframes event-form-zoom-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.event-form-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.event-form-title-row h3 {
+  margin: 0;
+  font-size: 1.9rem;
+}
+
+.ui-btn-mock {
+  width: auto;
+  padding: 9px 13px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 50%, var(--border));
+  background: var(--shell);
+  color: var(--primary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ui-btn-mock:hover {
+  background: color-mix(in srgb, var(--primary) 8%, var(--shell));
+}
+
+.ui-btn-mock:active {
+  transform: translateY(0);
+}
+
+.event-form-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.7fr;
+  gap: 14px;
+}
+
+.event-form-date-label {
+  position: relative;
+}
+
+.event-form-date-input {
+  font-variant-numeric: tabular-nums;
+}
+
+.event-form-date-input::-webkit-calendar-picker-indicator {
+  filter: var(--calendar-icon-filter);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .event-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .event-form-title-row .ui-btn-mock {
+    width: auto;
+    margin: 0 !important;
+  }
+}

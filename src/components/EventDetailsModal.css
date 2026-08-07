@@ -1,0 +1,86 @@
+.event-details-modal {
+  width: min(620px, 100%);
+}
+
+.event-details-description {
+  margin: 0 0 12px;
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+  line-height: 1.55;
+}
+
+.event-details-grid {
+  border: 1px solid color-mix(in srgb, var(--border) 86%, var(--primary));
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--shell) 94%, var(--bg));
+}
+
+.event-details-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, var(--primary));
+}
+
+.event-details-row:last-child {
+  border-bottom: 0;
+}
+
+.event-details-label {
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.event-details-value {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+  font-weight: 600;
+}
+
+.event-details-attendees {
+  margin-top: 14px;
+}
+
+.event-details-attendees-title {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  letter-spacing: 0.2px;
+  color: color-mix(in srgb, var(--head-accent) 88%, var(--text));
+  text-transform: uppercase;
+}
+
+.event-details-loading,
+.event-details-empty {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed color-mix(in srgb, var(--border) 86%, var(--primary));
+  border-radius: 10px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--shell) 92%, var(--bg));
+}
+
+.event-details-attendees-list {
+  display: grid;
+  gap: 8px;
+}
+
+.event-details-attendee {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, var(--primary));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--shell) 95%, var(--bg));
+}
+
+.event-details-attendee-name {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 90%, var(--head-accent));
+  font-weight: 700;
+}
+
+.event-details-attendee-meta {
+  margin: 3px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}

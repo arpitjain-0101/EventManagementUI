@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { EventPayload } from "../api";
+import "./EventForm.css";
 
 interface EventFormProps {
   form: EventPayload;
@@ -96,9 +97,9 @@ export default function EventForm({ form, isEditing, onSubmit, onFormChange }: E
 
   return (
     <form className="event-form" onSubmit={onSubmit}>
-      <div className="form-title-row">
+      <div className="event-form-title-row">
         <h3>{isEditing ? "Edit Event" : "Create Event"}</h3>
-        <button type="button" className="mock-btn" onClick={fillMockValues}>
+        <button type="button" className="ui-btn-mock" onClick={fillMockValues}>
           Mock Sample Inputs
         </button>
       </div>
@@ -120,11 +121,11 @@ export default function EventForm({ form, isEditing, onSubmit, onFormChange }: E
           onChange={(e) => onFormChange({ ...form, description: e.target.value })}
         />
       </label>
-      <div className="form-row">
-        <label className="date-field-label">
+      <div className="event-form-row">
+        <label className="event-form-date-label">
           Date & Time
           <input
-            className="form-date-input"
+            className="event-form-date-input"
             required
             type="datetime-local"
             value={form.date}

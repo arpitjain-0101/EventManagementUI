@@ -1,0 +1,30 @@
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--shell);
+  box-shadow: var(--shadow-soft);
+}
+
+.app-theme-picker {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .app-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-theme-picker {
+    min-width: 100%;
+  }
+}

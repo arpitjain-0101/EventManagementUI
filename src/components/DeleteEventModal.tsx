@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { EventDto } from "../api";
+import "./ModalCommon.css";
 
 interface DeleteEventModalProps {
   eventToDelete: EventDto | null;
@@ -29,12 +30,12 @@ export default function DeleteEventModal({ eventToDelete, onCancel, onConfirm }:
           <h3>Confirm Deletion</h3>
         </div>
 
-        <p className="confirm-delete-message">
+        <p className="modal-delete-message">
           Are you sure you want to delete <b>{eventToDelete.title}</b>?
         </p>
 
-        <div className="confirm-delete-actions">
-          <button type="button" className="ghost-btn" onClick={onCancel} disabled={isSubmitting}>
+        <div className="modal-delete-actions">
+          <button type="button" className="ui-btn-ghost" onClick={onCancel} disabled={isSubmitting}>
             No
           </button>
           <button
