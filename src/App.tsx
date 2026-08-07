@@ -1,14 +1,11 @@
 ﻿import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
-  deleteEventRegistration,
-  getEventRegistrations,
-  register,
-  type CreateEventRegistrationPayload,
   type EventDto,
-  type EventRegistrationDto,
   type EventPayload
 } from "./api";
+import DeleteEventModal from "./components/DeleteEventModal";
 import EventCard from "./components/EventCard";
+import EventDetailsModal from "./components/EventDetailsModal";
 import EventForm from "./components/EventForm";
 import RegisterUserModal from "./components/RegisterUserModal";
 import RegistrationsModal from "./components/RegistrationsModal";
@@ -17,7 +14,6 @@ import { createEventThunk, deleteEventThunk, fetchEvents, updateEventThunk } fro
 import "./App.css";
 
 const blank: EventPayload = { title: "", description: "", date: "", maxCapacity: 10 };
-const blankRegistration: CreateEventRegistrationPayload = { userId: "", name: "", email: "" };
 const THEME_STORAGE_KEY = "event-app-theme";
 
 type ThemeName = "dark" | "light" | "teal-green" | "teal-green-light" | "sunset";
@@ -70,30 +66,6 @@ function toDateTimeLocalValue(value?: string): string {
   )}`;
 }
 
-function formatEventDateTimeForModal(value?: string): { date: string; time: string } {
-  if (!value) {
-    return { date: "-", time: "-" };
-  }
-
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) {
-    return { date: "-", time: "-" };
-  }
-
-  const date = d.toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
-
-  const time = d.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit"
-  });
-
-  return { date, time };
-}
-
 export default function App() {
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.items);
@@ -119,23 +91,12 @@ export default function App() {
   const [form, setForm] = useState<EventPayload>(blank);
   const [editId, setEditId] = useState<number | string | null>(null);
   const [activeEvent, setActiveEvent] = useState<EventDto | null>(null);
-  const [registrations, setRegistrations] = useState<EventRegistrationDto[]>([]);
-  const [registrationsError, setRegistrationsError] = useState("");
-  const [isRegistrationsLoading, setIsRegistrationsLoading] = useState(false);
   const [registerEvent, setRegisterEvent] = useState<EventDto | null>(null);
-  const [registrationForm, setRegistrationForm] = useState<CreateEventRegistrationPayload>(blankRegistration);
-  const [registrationError, setRegistrationError] = useState("");
-  const [isSubmittingRegistration, setIsSubmittingRegistration] = useState(false);
   const [isFormBlinking, setIsFormBlinking] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [eventToDelete, setEventToDelete] = useState<EventDto | null>(null);
-  const [isDeleteSubmitting, setIsDeleteSubmitting] = useState(false);
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(null);
   const [detailsEvent, setDetailsEvent] = useState<EventDto | null>(null);
-  const [detailsRegistrations, setDetailsRegistrations] = useState<EventRegistrationDto[]>([]);
-  const [detailsRegistrationsError, setDetailsRegistrationsError] = useState("");
-  const [isDetailsRegistrationsLoading, setIsDetailsRegistrationsLoading] = useState(false);
-  const detailsRequestRef = useRef(0);
 
   useEffect(() => {
     void dispatch(fetchEvents());
@@ -217,79 +178,18 @@ export default function App() {
 
   async function openRegistrationsModal(evt: EventDto) {
     setActiveEvent(evt);
-    setRegistrations([]);
-    setRegistrationsError("");
-    setIsRegistrationsLoading(true);
-
-    try {
-      const users = await getEventRegistrations(evt.id);
-      setRegistrations(users);
-    } catch (e) {
-      setRegistrationsError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setIsRegistrationsLoading(false);
-    }
   }
 
   function closeRegistrationsModal() {
     setActiveEvent(null);
-    setRegistrations([]);
-    setRegistrationsError("");
-    setIsRegistrationsLoading(false);
-  }
-
-  async function removeUserFromEvent(userId: string) {
-    if (!activeEvent) return;
-
-    try {
-      await deleteEventRegistration(activeEvent.id, userId);
-      setRegistrations((prev) => prev.filter((user) => user.userId !== userId));
-      await dispatch(fetchEvents());
-    } catch (e) {
-      setRegistrationsError(e instanceof Error ? e.message : String(e));
-    }
   }
 
   function openRegisterModal(evt: EventDto) {
     setRegisterEvent(evt);
-    setRegistrationForm(blankRegistration);
-    setRegistrationError("");
-    setIsSubmittingRegistration(false);
   }
 
   function closeRegisterModal() {
     setRegisterEvent(null);
-    setRegistrationForm(blankRegistration);
-    setRegistrationError("");
-    setIsSubmittingRegistration(false);
-  }
-
-  async function submitRegistration(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!registerEvent) return;
-
-    const payload: CreateEventRegistrationPayload = {
-      userId: registrationForm.userId.trim(),
-      name: registrationForm.name.trim(),
-      email: registrationForm.email.trim()
-    };
-
-    if (!payload.userId || !payload.name || !payload.email) {
-      setRegistrationError("UserID, Name, and Email are required.");
-      return;
-    }
-
-    setRegistrationError("");
-    setIsSubmittingRegistration(true);
-    try {
-      await register(registerEvent.id, payload);
-      closeRegisterModal();
-      await dispatch(fetchEvents());
-    } catch (e) {
-      setRegistrationError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setIsSubmittingRegistration(false);
-    }
   }
 
   function startEditingEvent(evt: EventDto, dateValue?: string) {
@@ -329,51 +229,25 @@ export default function App() {
     setEventToDelete(evt);
   }
 
-  async function openEventDetails(evt: EventDto) {
-    const requestId = detailsRequestRef.current + 1;
-    detailsRequestRef.current = requestId;
-
+  function openEventDetails(evt: EventDto) {
     setDetailsEvent(evt);
-    setDetailsRegistrations([]);
-    setDetailsRegistrationsError("");
-    setIsDetailsRegistrationsLoading(true);
-
-    try {
-      const users = await getEventRegistrations(evt.id);
-      if (detailsRequestRef.current !== requestId) return;
-      setDetailsRegistrations(users);
-    } catch (e) {
-      if (detailsRequestRef.current !== requestId) return;
-      setDetailsRegistrationsError(e instanceof Error ? e.message : String(e));
-    } finally {
-      if (detailsRequestRef.current !== requestId) return;
-      setIsDetailsRegistrationsLoading(false);
-    }
   }
 
   function closeEventDetails() {
     setDetailsEvent(null);
-    setDetailsRegistrations([]);
-    setDetailsRegistrationsError("");
-    setIsDetailsRegistrationsLoading(false);
   }
 
   function cancelDeleteEvent() {
-    if (isDeleteSubmitting) return;
     setEventToDelete(null);
   }
 
-  async function confirmDeleteEvent() {
-    if (!eventToDelete) return;
-    setIsDeleteSubmitting(true);
+  async function confirmDeleteEvent(event: EventDto) {
     try {
-      await dispatch(deleteEventThunk(eventToDelete.id)).unwrap();
+      await dispatch(deleteEventThunk(event.id)).unwrap();
       setEventToDelete(null);
       showSuccessMessage("Event Deleted !!");
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsDeleteSubmitting(false);
     }
   }
 
@@ -426,7 +300,7 @@ export default function App() {
                   event={evt}
                   dateValue={toDateTimeLocalValue(evt.date)}
                   onOpenDetails={(event) => {
-                    void openEventDetails(event);
+                    openEventDetails(event);
                   }}
                   onEdit={(event) => {
                     startEditingEvent(event);
@@ -448,141 +322,25 @@ export default function App() {
         )}
       </section>
 
-      {detailsEvent && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Event details"
-          onClick={closeEventDetails}
-        >
-          <div
-            className="modal-panel modal-panel-compact event-details-modal"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <div className="modal-header">
-              <h3>
-                Event Details | <span className="modal-event-tag">{detailsEvent.title}</span>
-              </h3>
-              <div className="modal-header-actions">
-                <button
-                  type="button"
-                  className="ghost-btn modal-close-btn"
-                  aria-label="Close"
-                  title="Close"
-                  onClick={closeEventDetails}
-                >
-                  <FontAwesomeIcon icon={byPrefixAndName.fas["xmark"]} className="modal-close-icon" />
-                </button>
-              </div>
-            </div>
-
-            <p className="event-details-description">{detailsEvent.description || "-"}</p>
-
-            <div className="event-details-grid" role="table" aria-label="Event information">
-              <div className="event-details-row" role="row">
-                <span className="event-details-label" role="columnheader">
-                  Date
-                </span>
-                <span className="event-details-value" role="cell">
-                  {formatEventDateTimeForModal(detailsEvent.date).date}
-                </span>
-              </div>
-              <div className="event-details-row" role="row">
-                <span className="event-details-label" role="columnheader">
-                  Time
-                </span>
-                <span className="event-details-value" role="cell">
-                  {formatEventDateTimeForModal(detailsEvent.date).time}
-                </span>
-              </div>
-              <div className="event-details-row" role="row">
-                <span className="event-details-label" role="columnheader">
-                  Capacity
-                </span>
-                <span className="event-details-value" role="cell">
-                  {detailsEvent.currentRegistrations ?? 0}/{detailsEvent.maxCapacity ?? 0}
-                </span>
-              </div>
-            </div>
-
-            <div className="event-details-attendees">
-              <h4 className="event-details-attendees-title">Attendees ({detailsRegistrations.length})</h4>
-
-              {detailsRegistrationsError && <p className="error">{detailsRegistrationsError}</p>}
-              {isDetailsRegistrationsLoading && <p className="event-details-loading">Loading attendees...</p>}
-
-              {!isDetailsRegistrationsLoading && !detailsRegistrationsError && (
-                detailsRegistrations.length === 0 ? (
-                  <p className="event-details-empty">No attendees registered yet.</p>
-                ) : (
-                  <div className="event-details-attendees-list" role="list" aria-label="Attendees list">
-                    {detailsRegistrations.map((user) => (
-                      <div className="event-details-attendee" role="listitem" key={user.userId}>
-                        <p className="event-details-attendee-name">{user.name || "-"}</p>
-                        <p className="event-details-attendee-meta">
-                          {user.userId || "-"} | {user.email || "-"}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <EventDetailsModal event={detailsEvent} onClose={closeEventDetails} />
 
       <RegistrationsModal
         activeEvent={activeEvent}
-        registrations={registrations}
-        registrationsError={registrationsError}
-        isRegistrationsLoading={isRegistrationsLoading}
         onClose={closeRegistrationsModal}
-        onRemoveUser={(userId) => {
-          void removeUserFromEvent(userId);
+        onUsersChanged={async () => {
+          await dispatch(fetchEvents()).unwrap();
         }}
       />
 
       <RegisterUserModal
         registerEvent={registerEvent}
-        registrationForm={registrationForm}
-        registrationError={registrationError}
-        isSubmittingRegistration={isSubmittingRegistration}
         onClose={closeRegisterModal}
-        onSubmit={submitRegistration}
-        onFormChange={setRegistrationForm}
+        onRegistered={async () => {
+          await dispatch(fetchEvents()).unwrap();
+        }}
       />
 
-      {eventToDelete && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Confirm delete event">
-          <div className="modal-panel modal-panel-compact">
-            <div className="modal-header">
-              <h3>Confirm Deletion</h3>
-            </div>
-
-            <p className="confirm-delete-message">Are you sure you want to delete <b>{eventToDelete.title}</b>?</p>
-
-            <div className="confirm-delete-actions">
-              <button type="button" className="ghost-btn" onClick={cancelDeleteEvent} disabled={isDeleteSubmitting}>
-                No
-              </button>
-              <button
-                type="button"
-                className="event-action-btn-danger"
-                onClick={() => {
-                  void confirmDeleteEvent();
-                }}
-                disabled={isDeleteSubmitting}
-              >
-                {isDeleteSubmitting ? "Deleting..." : "Yes"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteEventModal eventToDelete={eventToDelete} onCancel={cancelDeleteEvent} onConfirm={confirmDeleteEvent} />
     </div>
   );
 }

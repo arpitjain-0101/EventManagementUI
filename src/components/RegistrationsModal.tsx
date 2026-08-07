@@ -1,4 +1,5 @@
-import type { EventDto, EventRegistrationDto } from "../api";
+import { useEffect, useRef, useState } from "react";
+import { deleteEventRegistration, getEventRegistrations, type EventDto, type EventRegistrationDto } from "../api";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];
@@ -35,22 +36,67 @@ function FontAwesomeIcon({ icon, className }: { icon: IconDefinition; className?
 
 interface RegistrationsModalProps {
   activeEvent: EventDto | null;
-  registrations: EventRegistrationDto[];
-  registrationsError: string;
-  isRegistrationsLoading: boolean;
   onClose: () => void;
-  onRemoveUser: (userId: string) => void;
+  onUsersChanged?: () => void | Promise<void>;
 }
 
 export default function RegistrationsModal({
   activeEvent,
-  registrations,
-  registrationsError,
-  isRegistrationsLoading,
   onClose,
-  onRemoveUser
+  onUsersChanged
 }: RegistrationsModalProps) {
+  const [registrations, setRegistrations] = useState<EventRegistrationDto[]>([]);
+  const [registrationsError, setRegistrationsError] = useState("");
+  const [isRegistrationsLoading, setIsRegistrationsLoading] = useState(false);
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+  const requestRef = useRef(0);
+
+  useEffect(() => {
+    if (!activeEvent) {
+      setRegistrations([]);
+      setRegistrationsError("");
+      setIsRegistrationsLoading(false);
+      return;
+    }
+
+    const requestId = requestRef.current + 1;
+    requestRef.current = requestId;
+
+    setRegistrations([]);
+    setRegistrationsError("");
+    setIsRegistrationsLoading(true);
+
+    void (async () => {
+      try {
+        const users = await getEventRegistrations(activeEvent.id);
+        if (requestRef.current !== requestId) return;
+        setRegistrations(users);
+      } catch (error) {
+        if (requestRef.current !== requestId) return;
+        setRegistrationsError(error instanceof Error ? error.message : String(error));
+      } finally {
+        if (requestRef.current !== requestId) return;
+        setIsRegistrationsLoading(false);
+      }
+    })();
+  }, [activeEvent]);
+
   if (!activeEvent) return null;
+
+  async function removeUserFromEvent(userId: string) {
+    if (!activeEvent) return;
+
+    try {
+      setRemovingUserId(userId);
+      await deleteEventRegistration(activeEvent.id, userId);
+      setRegistrations((prev) => prev.filter((user) => user.userId !== userId));
+      await onUsersChanged?.();
+    } catch (error) {
+      setRegistrationsError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setRemovingUserId(null);
+    }
+  }
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Event users">
@@ -92,8 +138,9 @@ export default function RegistrationsModal({
                       className="danger-icon-btn"
                       aria-label={`Delete ${user.userId} from event`}
                       title="Delete user from event"
+                      disabled={removingUserId === user.userId}
                       onClick={() => {
-                        onRemoveUser(user.userId);
+                        void removeUserFromEvent(user.userId);
                       }}
                     >
                       <FontAwesomeIcon icon={byPrefixAndName.fas["trash"]} className="danger-icon-svg" />

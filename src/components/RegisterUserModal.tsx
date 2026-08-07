@@ -1,5 +1,5 @@
-import type { FormEvent } from "react";
-import type { CreateEventRegistrationPayload, EventDto } from "../api";
+import { useEffect, useState, type FormEvent } from "react";
+import { register, type CreateEventRegistrationPayload, type EventDto } from "../api";
 
 type IconDefinition = {
   viewBox: [number, number, number, number];
@@ -32,13 +32,11 @@ function FontAwesomeIcon({ icon, className }: { icon: IconDefinition; className?
 
 interface RegisterUserModalProps {
   registerEvent: EventDto | null;
-  registrationForm: CreateEventRegistrationPayload;
-  registrationError: string;
-  isSubmittingRegistration: boolean;
   onClose: () => void;
-  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-  onFormChange: (next: CreateEventRegistrationPayload) => void;
+  onRegistered?: () => void | Promise<void>;
 }
+
+const blankRegistration: CreateEventRegistrationPayload = { userId: "", name: "", email: "" };
 
 const registrationMockSamples: CreateEventRegistrationPayload[] = [
   { userId: "u_alex_101", name: "Alex Carter", email: "alex.carter@example.com" },
@@ -53,13 +51,26 @@ const registrationMockSamples: CreateEventRegistrationPayload[] = [
 
 export default function RegisterUserModal({
   registerEvent,
-  registrationForm,
-  registrationError,
-  isSubmittingRegistration,
   onClose,
-  onSubmit,
-  onFormChange
+  onRegistered
 }: RegisterUserModalProps) {
+  const [registrationForm, setRegistrationForm] = useState<CreateEventRegistrationPayload>(blankRegistration);
+  const [registrationError, setRegistrationError] = useState("");
+  const [isSubmittingRegistration, setIsSubmittingRegistration] = useState(false);
+
+  useEffect(() => {
+    if (!registerEvent) {
+      setRegistrationForm(blankRegistration);
+      setRegistrationError("");
+      setIsSubmittingRegistration(false);
+      return;
+    }
+
+    setRegistrationForm(blankRegistration);
+    setRegistrationError("");
+    setIsSubmittingRegistration(false);
+  }, [registerEvent]);
+
   if (!registerEvent) return null;
 
   function fillMockRegistration() {
@@ -67,11 +78,39 @@ export default function RegisterUserModal({
       registrationMockSamples[Math.floor(Math.random() * registrationMockSamples.length)] ??
       registrationMockSamples[0];
 
-    onFormChange({
+    setRegistrationForm({
       userId: randomSample.userId,
       name: randomSample.name,
       email: randomSample.email
     });
+  }
+
+  async function submitRegistration(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!registerEvent) return;
+
+    const payload: CreateEventRegistrationPayload = {
+      userId: registrationForm.userId.trim(),
+      name: registrationForm.name.trim(),
+      email: registrationForm.email.trim()
+    };
+
+    if (!payload.userId || !payload.name || !payload.email) {
+      setRegistrationError("UserID, Name, and Email are required.");
+      return;
+    }
+
+    setRegistrationError("");
+    setIsSubmittingRegistration(true);
+    try {
+      await register(registerEvent.id, payload);
+      onClose();
+      await onRegistered?.();
+    } catch (error) {
+      setRegistrationError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSubmittingRegistration(false);
+    }
   }
 
   return (
@@ -89,14 +128,14 @@ export default function RegisterUserModal({
           </div>
         </div>
 
-        <form className="modal-form" onSubmit={onSubmit}>
+        <form className="modal-form" onSubmit={submitRegistration}>
           <label>
             UserID
             <input
               required
               value={registrationForm.userId}
               onChange={(e) =>
-                onFormChange({
+                setRegistrationForm({
                   ...registrationForm,
                   userId: e.target.value
                 })
@@ -110,7 +149,7 @@ export default function RegisterUserModal({
               required
               value={registrationForm.name}
               onChange={(e) =>
-                onFormChange({
+                setRegistrationForm({
                   ...registrationForm,
                   name: e.target.value
                 })
@@ -125,7 +164,7 @@ export default function RegisterUserModal({
               type="email"
               value={registrationForm.email}
               onChange={(e) =>
-                onFormChange({
+                setRegistrationForm({
                   ...registrationForm,
                   email: e.target.value
                 })
