@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { EventDto } from "../api";
-import { toDateTimeLocalValue } from "../utils/dateTime";
+import type { EventDto } from "../../api";
+import { toDateTimeLocalValue } from "../../utils/dateTime";
 import EventCard from "./EventCard";
 import "./EventsSection.css";
 

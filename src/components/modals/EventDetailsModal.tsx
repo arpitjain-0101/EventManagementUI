@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getEventRegistrations, type EventDto, type EventRegistrationDto } from "../api";
+import { getEventRegistrations, type EventDto, type EventRegistrationDto } from "../../api";
 import "./EventDetailsModal.css";
 import "./ModalCommon.css";
 

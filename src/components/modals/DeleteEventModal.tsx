@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { EventDto } from "../api";
+import type { EventDto } from "../../api";
 import "./ModalCommon.css";
 
 interface DeleteEventModalProps {
