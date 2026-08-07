@@ -1,8 +1,8 @@
-﻿const API_BASE =
-  import.meta.env.VITE_API_URL ??
-  (import.meta.env.DEV
-    ? "http://localhost:5073"
-    : "https://eventmanagementapi-bkcucwf3b4e7djf7.canadacentral-01.azurewebsites.net");
+﻿const API_BASE = import.meta.env.VITE_API_URL;
+
+if (!API_BASE) {
+  throw new Error("Missing VITE_API_URL environment variable");
+}
 
 export type EventId = number | string;
 
