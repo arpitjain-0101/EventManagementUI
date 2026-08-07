@@ -178,6 +178,7 @@ export default function App() {
         onClose={closeRegistrationsModal}
         onUsersChanged={async () => {
           await dispatch(fetchEvents()).unwrap();
+          showSuccessMessage("User Removed From Event !!");
         }}
       />
 
@@ -186,6 +187,7 @@ export default function App() {
         onClose={closeRegisterModal}
         onRegistered={async () => {
           await dispatch(fetchEvents()).unwrap();
+          showSuccessMessage("User Registered Successfully !!");
         }}
       />
 
